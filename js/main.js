@@ -16,6 +16,10 @@ const initApp = () => {
 	homeButton.addEventListener('click', loadWeather);
 	const saveButton = document.getElementById('saveLocation');
 	saveButton.addEventListener('click', saveLocation);
+	const unitButton = document.getElementById('unit');
+	unitButton.addEventListener('click', setUnitPref);
+	const refreshButton = document.getElementById('refresh');
+	refreshButton.addEventListener('click', refreshWeather);
 	// Setup
 
 	// Load Wether
@@ -108,6 +112,13 @@ const setUnitPref = () => {
 	currentLoc.toggleUnit();
 	updateDataAndDisplay(currentLoc);
 };
+
+const refreshWeather = () => {
+	const refreshIcon = document.querySelector('.fa-sync-alt');
+	addSpinner(refreshIcon);
+	updateDataAndDisplay(currentLoc);
+};
+
 const updateDataAndDisplay = async locationObj => {
 	console.log(locationObj);
 	// const weatherJson = await getWeatherFromCoords(locationObj);
