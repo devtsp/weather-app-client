@@ -19,7 +19,7 @@ const updateWeatherLocationHeader = message => {
 	h1.textContent = message;
 };
 
-const updateScreenReaderConfirmation = message => {
+export const updateScreenReaderConfirmation = message => {
 	document.getElementById('confirmation').textContent = message;
 };
 
