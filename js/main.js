@@ -102,6 +102,12 @@ const saveLocation = () => {
 	}
 };
 
+const setUnitPref = () => {
+	const unitIcon = document.querySelector('.fa-chart-bar');
+	addSpinner(unitIcon);
+	currentLoc.toggleUnit();
+	updateDataAndDisplay(currentLoc);
+};
 const updateDataAndDisplay = async locationObj => {
 	console.log(locationObj);
 	// const weatherJson = await getWeatherFromCoords(locationObj);
