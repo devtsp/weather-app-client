@@ -1,65 +1,86 @@
+import CurrentLocation from './CurrentLocation.js';
+import { addSpinner, displayError } from './domFunctions.js';
+import { getHomeLocation, setLocationObject } from './dataFunctions.js';
 
-import { addSpinner, displayError } from "./domFunctions.js";
-
-import CurrentLocation from "./CurrentLocation.js";
-
-import { setLocationObject }  from "./dataFunctions.js";
-
-// Objeto con location data 
 const currentLoc = new CurrentLocation();
 
 const initApp = () => {
-  // add listeners!!
-  // geoloc butn
-  const geoButton = document.getElementById("getLocation");
-  geoButton.addEventListener("click", getGeoWeather);
-  // home btn
-  const homeButton = document.getElementById("home");
-  homeButton.addEventListener("click",loadWeather)
-  // set up
+	// Add listeners
+	const geoButton = document.getElementById('getLocation');
+	geoButton.addEventListener('click', getGeoWeather);
+	const homeButton = document.getElementById('home');
+	homeButton.addEventListener('click', loadWeather);
+	// Setup
 
-  // load weather
-  
+	// Load Wether
+	loadWeather();
 };
 
-// DOM check para cargar las funcionalidades
-document.addEventListener("DOMContentLoaded", initApp);
+document.addEventListener('DOMContentLoaded', initApp);
 
-// Funcion madre: llama a varias helper (animación, validación)
-const getGeoWeather = (event) => {
-  // if porque podriamos llamar a la función sin el click
-  if (event) {
-    if (event.type === "click") {
-      // si es llamada por click; add spinner animation!!
-      const mapIcon = document.querySelector(".fa-map-marker-alt");
-      addSpinner(mapIcon);
-    }
-  }
-  // check if geolocation is supported/enabled on browser first
-  if (!navigator.geolocation) geoError();
-  // built in!!! 
-  navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+const getGeoWeather = event => {
+	if (event) {
+		if (event.type === 'click') {
+			const mapIcon = document.querySelector('.fa-map-marker-alt');
+			addSpinner(mapIcon);
+		}
+	}
+	if (!navigator.geolocation) {
+		return geoError();
+	}
+	navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
 };
 
-// error handling procedural func
-const geoError = (errObj) => {
-  // error message or geoloc disabled
-  const errMsg = errObj ? errObj.message : "Geolocation not supported";
-  // muestra error o unabled en header y envia al screen reader
-  displayError(errMsg, errMsg);
+const geoError = errObj => {
+	const errMsg = errObj ? errObj.message : 'Geolocation not supported';
+	displayError(errMsg, errMsg);
 };
 
-const geoSuccess = (position) => {
-  const myCoordsObj = {
-    lat: position.coords.latitude,
-    lon: position.coords.longitude,
-    name: `Lat:${position.coords.latitude} Long:${position.coords.longitude}`
-  };
-  setLocationObject(currentLoc, myCoordsObj);
-  updateDataAndDisplay(currentLoc);
+const geoSuccess = position => {
+	const myCoordsObj = {
+		lat: position.coords.latitude,
+		lon: position.coords.longitude,
+		name: `Lat:${position.coords.latitude} Long:${position.coords.longitude}`,
+	};
+	setLocationObject(currentLoc, myCoordsObj);
+	updateDataAndDisplay(currentLoc);
 };
 
-const updateDataAndDisplay = async (locationObj) => {
-  // const weatherJson = await getWeatherFromCoords(locationObj);
-  // if (weatherJson) updateDataAndDisplay(weatherJson, locationObj);
+const loadWeather = event => {
+	const savedLocation = getHomeLocation();
+	if (!savedLocation && !event) {
+		return getGeoWeather();
+	}
+	if (!savedLocation && event.type === 'click') {
+		displayError(
+			'No Home Location saved',
+			'Please save your home location first'
+		);
+	} else if (savedLocation && !event) {
+		displayHomeLocationWeather(savedLocation);
+	} else {
+		const homeIcon = document.querySelector('.fa-home');
+		addSpinner(homeIcon);
+		displayHomeLocationWeather(savedLocation);
+	}
+};
+
+const displayHomeLocationWeather = home => {
+	if (typeof home === 'string') {
+		const locationJson = JSON.parse(home);
+		const myCoordsObj = {
+			lat: locationJson.lat,
+			lon: locationJson.lon,
+			name: locationJson.name,
+			unit: locationJson.unit,
+		};
+		setLocationObject(currentLoc, myCoordsObj);
+		updateDataAndDisplay(currentLoc);
+	}
+};
+
+const updateDataAndDisplay = async locationObj => {
+	console.log(locationObj);
+	// const weatherJson = await getWeatherFromCoords(locationObj);
+	// if (weatherJson) updateDataAndDisplay(weatherJson, locationObj);
 };
