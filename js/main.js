@@ -1,10 +1,16 @@
 import CurrentLocation from './CurrentLocation.js';
 import {
+	setPlaceholderText,
 	addSpinner,
 	displayError,
+	displayApiError,
 	updateScreenReaderConfirmation,
 } from './domFunctions.js';
-import { getHomeLocation, setLocationObject } from './dataFunctions.js';
+import {
+	getHomeLocation,
+	setLocationObject,
+	cleanText,
+} from './dataFunctions.js';
 
 const currentLoc = new CurrentLocation();
 
@@ -20,8 +26,10 @@ const initApp = () => {
 	unitButton.addEventListener('click', setUnitPref);
 	const refreshButton = document.getElementById('refresh');
 	refreshButton.addEventListener('click', refreshWeather);
+	const locationEntry = document.getElementById('searchBar_form');
+	locationEntry.addEventListener('submit', submitNewLocation);
 	// Setup
-
+	setPlaceholderText();
 	// Load Wether
 	loadWeather();
 };
