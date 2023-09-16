@@ -127,6 +127,25 @@ const refreshWeather = () => {
 	updateDataAndDisplay(currentLoc);
 };
 
+const submitNewLocation = async event => {
+	event.preventDefault();
+	const text = document.getElementById('searchBar_text').value;
+	const entryText = cleanText(text);
+	if (!entryText.length) {
+		return;
+	}
+	const locationIcon = document.querySelector('.fa-search');
+	addSpinner(locationIcon);
+	const coordsData = await getCoordsFromApi(entryText, currentLoc.getUnit());
+	if (coordsData.cod === 200) {
+		const myCoordsObj = {};
+		setLocationObject(currentLoc, myCoordsObj);
+		updateDataAndDisplay(currentLoc);
+	} else {
+		displayApiError(coordsData);
+	}
+};
+
 const updateDataAndDisplay = async locationObj => {
 	console.log(locationObj);
 	// const weatherJson = await getWeatherFromCoords(locationObj);
