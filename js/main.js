@@ -10,6 +10,7 @@ import {
 	getHomeLocation,
 	setLocationObject,
 	cleanText,
+	getCoordsFromApi,
 } from './dataFunctions.js';
 
 const currentLoc = new CurrentLocation();
@@ -26,7 +27,7 @@ const initApp = () => {
 	unitButton.addEventListener('click', setUnitPref);
 	const refreshButton = document.getElementById('refresh');
 	refreshButton.addEventListener('click', refreshWeather);
-	const locationEntry = document.getElementById('searchBar_form');
+	const locationEntry = document.getElementById('searchBar__form');
 	locationEntry.addEventListener('submit', submitNewLocation);
 	// Setup
 	setPlaceholderText();
@@ -129,7 +130,7 @@ const refreshWeather = () => {
 
 const submitNewLocation = async event => {
 	event.preventDefault();
-	const text = document.getElementById('searchBar_text').value;
+	const text = document.getElementById('searchBar__text').value;
 	const entryText = cleanText(text);
 	if (!entryText.length) {
 		return;
@@ -137,12 +138,16 @@ const submitNewLocation = async event => {
 	const locationIcon = document.querySelector('.fa-search');
 	addSpinner(locationIcon);
 	const coordsData = await getCoordsFromApi(entryText, currentLoc.getUnit());
-	if (coordsData.cod === 200) {
-		const myCoordsObj = {};
-		setLocationObject(currentLoc, myCoordsObj);
-		updateDataAndDisplay(currentLoc);
+	if (coordsData) {
+		if (coordsData.cod === 200) {
+			const myCoordsObj = {};
+			setLocationObject(currentLoc, myCoordsObj);
+			updateDataAndDisplay(currentLoc);
+		} else {
+			displayApiError(coordsData);
+		}
 	} else {
-		displayApiError(coordsData);
+		displayError('Connection Error', 'Connection Error');
 	}
 };
 

@@ -1,5 +1,5 @@
 export const setPlaceholderText = () => {
-	const input = document.getElementById('saerchBar__text');
+	const input = document.getElementById('searchBar__text');
 	window.innerWidth < 400
 		? (input.placeholder = 'City, State, Country')
 		: (input.placeholder = 'City, State, Country, or Zip Code');
