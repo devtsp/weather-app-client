@@ -44,11 +44,55 @@ export const updateScreenReaderConfirmation = message => {
 	document.getElementById('confirmation').textContent = message;
 };
 
-const geoSuccess = position => {
-	const myCoordsObj = {
-		lat: position.coords.latitude,
-		lon: position.coords.longitude,
-		name: `Lat:${position.coords.latitude} Long:${position.coords.longitude}`,
-	};
-	// set location object
+export const udpateDisplay = (weatherObj, locationObj) => {
+	fadeDisplay();
+	clearDisplay();
+	const weatherClass = getWeatherClass(weatherObj.currentConditions.icon);
+	setBGImage(weatherClass);
+	fadeDisplay();
+};
+
+const fadeDisplay = () => {
+	const currentConditions = document.getElementById('currentForecast');
+	currentConditions.classList.toggle('zero-vis');
+	currentConditions.classList.toggle('fade-in');
+	const sixDay = document.getElementById('dailyForecast');
+	sixDay.classList.toggle('zero-vis');
+	sixDay.classList.toggle('fade-in');
+};
+
+const clearDisplay = () => {
+	const currentConditions = document.getElementById(
+		'currentForecast__conditions'
+	);
+	deleteContents(currentConditions);
+	const sixDayForecast = document.getElementById('dailyForecast__contents');
+	deleteContents(sixDayForecast);
+};
+
+const deleteContents = parentElement => {
+	let child = parentElement.lastElementChild;
+	while (child) {
+		parentElement.removeChild(child);
+		child = parentElement.lastElementChild;
+	}
+};
+
+const getWeatherClass = icon => {
+	console.log(icon);
+	let weatherClass = 'clouds';
+	/fog/.test(icon) && (weatherClass = 'fog');
+	/rain/.test(icon) && (weatherClass = 'rain');
+	/snow/.test(icon) && (weatherClass = 'snow');
+	console.log(weatherClass);
+	return weatherClass;
+};
+
+const setBGImage = weatherClass => {
+	document.documentElement.classList.add(weatherClass);
+	document.documentElement.classList.forEach(img => {
+		if (img !== weatherClass) {
+			document.documentElement.classList.remove(img);
+		}
+	});
 };

@@ -5,6 +5,7 @@ import {
 	displayError,
 	displayApiError,
 	updateScreenReaderConfirmation,
+	udpateDisplay,
 } from './domFunctions.js';
 import {
 	getHomeLocation,
@@ -159,8 +160,8 @@ const submitNewLocation = async event => {
 };
 
 const updateDataAndDisplay = async locationObj => {
-	console.log(locationObj);
-	const weatherJson = await getWeatherFromCoords(locationObj);
-	console.log(weatherJson);
-	// if (weatherJson) updateDataAndDisplay(weatherJson, locationObj);
+	console.log('Location Requested: ', locationObj);
+	const weatherObject = await getWeatherFromCoords(locationObj);
+	console.log('Weather: ', weatherObject);
+	if (weatherObject) udpateDisplay(weatherObject, locationObj);
 };
