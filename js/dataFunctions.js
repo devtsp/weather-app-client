@@ -14,6 +14,23 @@ export const getHomeLocation = () => {
 	return localStorage.getItem('defaultWeatherLocation');
 };
 
+export const getWeatherFromCoords = async locationObj => {
+	const lat = locationObj.getLat();
+	const lon = locationObj.getLon();
+	const units = locationObj.getUnit();
+	// https://www.visualcrossing.com/weather/weather-data-services#
+	const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat},${lon}?unitGroup=${
+		units === 'imteprial' ? 'us' : units === 'metric' ? 'metric' : 'us'
+	}&include=alerts%2Ccurrent&key=PPJXX3FU5BTQEKCJM3QA5DQ5A&contentType=json`;
+	try {
+		const dataStream = await fetch(url);
+		const jsonData = await dataStream.json();
+		return jsonData;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 export const getCoordsFromApi = async (entryText, units) => {
 	const regex = /^\d+$/g;
 	const flag = regex.test(entryText) ? 'zip' : 'q';
