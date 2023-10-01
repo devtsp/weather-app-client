@@ -160,8 +160,8 @@ const submitNewLocation = async event => {
 };
 
 const updateDataAndDisplay = async locationObj => {
-	console.log('Location Requested: ', locationObj);
+	// console.log('Location Requested: ', locationObj);
 	const weatherObject = await getWeatherFromCoords(locationObj);
-	console.log('Weather: ', weatherObject);
+	// console.log('Weather: ', weatherObject);
 	if (weatherObject) udpateDisplay(weatherObject, locationObj);
 };

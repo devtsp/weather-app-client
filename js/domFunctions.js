@@ -46,18 +46,19 @@ export const updateScreenReaderConfirmation = message => {
 	document.getElementById('confirmation').textContent = message;
 };
 
-export const udpateDisplay = (weatherObj, locationObj) => {
+export const udpateDisplay = async (weatherObj, locationObj) => {
 	fadeDisplay();
 	clearDisplay();
-	const weatherClass = getWeatherClass(weatherObj.currentConditions.icon);
+	const weatherClass = getWeatherClass(weatherObj.days[0].icon);
 	setBGImage(weatherClass);
 	const screenRaderWeather = buildScreenReaderWeather(weatherObj, locationObj);
 	updateScreenReaderConfirmation(screenRaderWeather);
 	updateWeatherLocationHeader(locationObj.getName());
-	const currentConditionsArray = createCurrentConditionsDivs(
-		weatherJson,
+	const currentConditionsArray = await createCurrentConditionsDivs(
+		weatherObj,
 		locationObj.getUnit()
 	);
+	displayCurrentConditions(currentConditionsArray);
 	setFocusOnSearch();
 	fadeDisplay();
 };
@@ -89,16 +90,15 @@ const deleteContents = parentElement => {
 };
 
 const getWeatherClass = icon => {
-	console.log(icon);
 	let weatherClass = 'clouds';
 	/fog/.test(icon) && (weatherClass = 'fog');
 	/rain/.test(icon) && (weatherClass = 'rain');
 	/snow/.test(icon) && (weatherClass = 'snow');
-	console.log(weatherClass);
 	return weatherClass;
 };
 
 const setBGImage = weatherClass => {
+	console.log(weatherClass);
 	document.documentElement.classList.add(weatherClass);
 	document.documentElement.classList.forEach(img => {
 		if (img !== weatherClass) {
@@ -120,20 +120,24 @@ const setFocusOnSearch = () => {
 	document.getElementById('searchBar__text').focus();
 };
 
-const createCurrentConditionsDivs = (weatherJson, unit) => {
+const createCurrentConditionsDivs = async (weatherJson, unit) => {
 	const tempUnit = unit === 'imperial' ? 'F' : 'C';
 	const windUnit = unit === 'imperial' ? 'mph' : 'kph';
-	const icon = createMainImgDiv(
+	const icon = await createMainImgDiv(
 		weatherJson.days[0].icon,
 		weatherJson.days[0].description
 	);
 	const temp = createElement(
 		'div',
 		'temp',
-		`${Math.round(Number(weatherJson.days[0].temp))}°`
+		`${Math.round(Number(weatherJson.days[0].temp))}°`,
+		tempUnit
 	);
-	const properDescription = toProperCase(weatherJson.days[0].description);
-	const description = createElement('div', 'desc', properDescription);
+	const description = createElement(
+		'div',
+		'desc',
+		weatherJson.days[0].conditions
+	);
 	const feelsLike = createElement(
 		'div',
 		'feels',
@@ -162,13 +166,13 @@ const createCurrentConditionsDivs = (weatherJson, unit) => {
 	return [icon, temp, description, feelsLike, maxTemp, minTemp, humidity, wind];
 };
 
-const createMainImgDiv = (icon, altText) => {
+const createMainImgDiv = async (icon, altText) => {
 	const iconDiv = createElement('div', 'icon');
 	iconDiv.id = 'icon';
-	const faIcon = translateIconToFontAwesome(icon);
-	faIcon.ariaHidden = true;
-	faIcon.title = altText;
-	iconDiv.appendChild(faIcon);
+	const svg = await getSvgParsedString(icon);
+	iconDiv.innerHTML = svg;
+	// svg.ariaHidden = true;
+	// svg.title = altText;
 	return iconDiv;
 };
 
@@ -185,4 +189,33 @@ const createElement = (elementType, divClassName, divText, unit) => {
 		div.appendChild(unitDiv);
 	}
 	return div;
+};
+
+async function getSvgParsedString(svgName) {
+	try {
+		const response = await fetch(`img/weather-icons/${svgName}.svg`);
+		const svgText = await response.text();
+
+		// Create a new SVG element from the SVG text
+		const parser = new DOMParser();
+		const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+		const svgElement = svgDoc.documentElement;
+
+		// Convert the SVG element to an HTML string
+		const svgString = new XMLSerializer().serializeToString(svgElement);
+
+		return svgString;
+	} catch (error) {
+		console.error(`Error loading or parsing SVG: ${error}`);
+		return ':(';
+	}
+}
+
+const displayCurrentConditions = currentConditionsArray => {
+	const currentConditionsContainer = document.getElementById(
+		'currentForecast__conditions'
+	);
+	currentConditionsArray.forEach(cc => {
+		currentConditionsContainer.appendChild(cc);
+	});
 };
