@@ -54,7 +54,6 @@ const updateWeatherLocationHeader = message => {
 				: mapArray[1].slice(0, 12);
 		h1.textContent = `${lat} • ${lon}`;
 	} else {
-		console.log('else');
 		h1.textContent = message;
 	}
 };
