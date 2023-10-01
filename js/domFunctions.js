@@ -49,6 +49,8 @@ export const udpateDisplay = (weatherObj, locationObj) => {
 	clearDisplay();
 	const weatherClass = getWeatherClass(weatherObj.currentConditions.icon);
 	setBGImage(weatherClass);
+	const screenRaderWeather = buildScreenReaderWeather(weatherObj, locationObj);
+	updateScreenReaderConfirmation(screenRaderWeather);
 	fadeDisplay();
 };
 
@@ -95,4 +97,13 @@ const setBGImage = weatherClass => {
 			document.documentElement.classList.remove(img);
 		}
 	});
+};
+
+const buildScreenReaderWeather = (weatherJson, locationObj) => {
+	const location = locationObj.getName();
+	const unit = locationObj.getUnit();
+	const tempUnit = unit === 'imperial' ? 'Fahrenheit' : 'Celsius';
+	return `${weatherJson.days[0].description} ${Math.round(
+		Number(weatherJson.days[0].temp)
+	)} degrees ${tempUnit} in ${location}.`;
 };
