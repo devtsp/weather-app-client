@@ -76,6 +76,7 @@ export const udpateDisplay = async (weatherObj, locationObj) => {
 		locationObj.getUnit()
 	);
 	displayCurrentConditions(currentConditionsArray);
+	displaySixDayForecast(weatherObj);
 	setFocusOnSearch();
 	fadeDisplay();
 };
@@ -139,7 +140,7 @@ const setFocusOnSearch = () => {
 const createCurrentConditionsDivs = async (weatherJson, unit) => {
 	const tempUnit = unit === 'imperial' ? 'F' : 'C';
 	const windUnit = unit === 'imperial' ? 'mph' : 'kph';
-	const icon = await createMainImgDiv(
+	const icon = await createIconDiv(
 		weatherJson.days[0].icon,
 		weatherJson.days[0].description
 	);
@@ -182,7 +183,7 @@ const createCurrentConditionsDivs = async (weatherJson, unit) => {
 	return [icon, temp, description, feelsLike, maxTemp, minTemp, humidity, wind];
 };
 
-const createMainImgDiv = async (icon, altText) => {
+const createIconDiv = async (icon, altText) => {
 	const iconDiv = createElement('div', 'icon');
 	iconDiv.id = 'icon';
 	const svg = await getSvgParsedString(icon);
@@ -234,4 +235,49 @@ const displayCurrentConditions = currentConditionsArray => {
 	currentConditionsArray.forEach(cc => {
 		currentConditionsContainer.appendChild(cc);
 	});
+};
+
+const displaySixDayForecast = async weatherJson => {
+	for (let i = 1; i <= 6; i++) {
+		const dailyForecastArray = await createDailyForecastDivs(
+			weatherJson.days[i]
+		);
+		displayDailyForecast(dailyForecastArray);
+	}
+};
+
+const createDailyForecastDivs = async dayWeather => {
+	const dayAbbreviationText = getDayAbbreviation(dayWeather.datetime);
+	const dayAbbreviation = createElement(
+		'p',
+		'dayAbbreviation',
+		dayAbbreviationText
+	);
+	const dayIcon = await createIconDiv(dayWeather.icon);
+	const dayHigh = createElement(
+		'p',
+		'dayHigh',
+		`${Math.round(Number(dayWeather.tempmax))}°`
+	);
+	const dayLow = createElement(
+		'p',
+		'dayLow',
+		`${Math.round(Number(dayWeather.tempmin))}°`
+	);
+	return [dayAbbreviation, dayIcon, dayHigh, dayLow];
+};
+
+const getDayAbbreviation = data => {
+	return new Date(data).toUTCString().slice(0, 3).toUpperCase();
+};
+
+const displayDailyForecast = dailyForecastArray => {
+	const dayDiv = createElement('div', 'forecastDay');
+	dailyForecastArray.forEach(dailyForecast => {
+		dayDiv.appendChild(dailyForecast);
+	});
+	const dailyForecastContainer = document.getElementById(
+		'dailyForecast__contents'
+	);
+	dailyForecastContainer.appendChild(dayDiv);
 };
