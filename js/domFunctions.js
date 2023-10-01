@@ -1,3 +1,5 @@
+// https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/rio%20ceballos?unitGroup=metric&key=PPJXX3FU5BTQEKCJM3QA5DQ5A&contentType=json
+
 export const setPlaceholderText = () => {
 	const input = document.getElementById('searchBar__text');
 	window.innerWidth < 400
@@ -51,6 +53,12 @@ export const udpateDisplay = (weatherObj, locationObj) => {
 	setBGImage(weatherClass);
 	const screenRaderWeather = buildScreenReaderWeather(weatherObj, locationObj);
 	updateScreenReaderConfirmation(screenRaderWeather);
+	updateWeatherLocationHeader(locationObj.getName());
+	const currentConditionsArray = createCurrentConditionsDivs(
+		weatherJson,
+		locationObj.getUnit()
+	);
+	setFocusOnSearch();
 	fadeDisplay();
 };
 
@@ -106,4 +114,75 @@ const buildScreenReaderWeather = (weatherJson, locationObj) => {
 	return `${weatherJson.days[0].description} ${Math.round(
 		Number(weatherJson.days[0].temp)
 	)} degrees ${tempUnit} in ${location}.`;
+};
+
+const setFocusOnSearch = () => {
+	document.getElementById('searchBar__text').focus();
+};
+
+const createCurrentConditionsDivs = (weatherJson, unit) => {
+	const tempUnit = unit === 'imperial' ? 'F' : 'C';
+	const windUnit = unit === 'imperial' ? 'mph' : 'kph';
+	const icon = createMainImgDiv(
+		weatherJson.days[0].icon,
+		weatherJson.days[0].description
+	);
+	const temp = createElement(
+		'div',
+		'temp',
+		`${Math.round(Number(weatherJson.days[0].temp))}°`
+	);
+	const properDescription = toProperCase(weatherJson.days[0].description);
+	const description = createElement('div', 'desc', properDescription);
+	const feelsLike = createElement(
+		'div',
+		'feels',
+		`Feels like ${Math.round(Number(weatherJson.days[0].feelslike))}°`
+	);
+	const maxTemp = createElement(
+		'div',
+		'maxtemp',
+		`High ${Math.round(Number(weatherJson.days[0].tempmax))}°`
+	);
+	const minTemp = createElement(
+		'div',
+		'mintemp',
+		`Low ${Math.round(Number(weatherJson.days[0].tempmin))}°`
+	);
+	const humidity = createElement(
+		'div',
+		'humidity',
+		`Humidity ${Math.round(Number(weatherJson.days[0].humidity))}%`
+	);
+	const wind = createElement(
+		'div',
+		'wind',
+		`Wind ${Math.round(Number(weatherJson.days[0].windspeed))} ${windUnit}`
+	);
+	return [icon, temp, description, feelsLike, maxTemp, minTemp, humidity, wind];
+};
+
+const createMainImgDiv = (icon, altText) => {
+	const iconDiv = createElement('div', 'icon');
+	iconDiv.id = 'icon';
+	const faIcon = translateIconToFontAwesome(icon);
+	faIcon.ariaHidden = true;
+	faIcon.title = altText;
+	iconDiv.appendChild(faIcon);
+	return iconDiv;
+};
+
+const createElement = (elementType, divClassName, divText, unit) => {
+	const div = document.createElement(elementType);
+	div.className = divClassName;
+	if (divText) {
+		div.textContent = divText;
+	}
+	if (divClassName === 'temp') {
+		const unitDiv = document.createElement('div');
+		unitDiv.className = 'unit';
+		unitDiv.textContent = unit;
+		div.appendChild(unitDiv);
+	}
+	return div;
 };
