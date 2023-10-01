@@ -39,7 +39,24 @@ export const toProperCase = text => {
 
 const updateWeatherLocationHeader = message => {
 	const h1 = document.getElementById('currentForecast__location');
-	h1.textContent = message;
+	if (message.indexOf('Lat:') !== -1 && message.indexOf('Long:') !== -1) {
+		const messageArray = message.split(' ');
+		const mapArray = messageArray.map((word, index) => {
+			return word.replace(':', ': ');
+		});
+		const lat =
+			mapArray[0].indexOf('-') === -1
+				? mapArray[0].slice(0, 10)
+				: mapArray[0].slice(0, 11);
+		const lon =
+			mapArray[1].indexOf('-') === -1
+				? mapArray[1].slice(0, 11)
+				: mapArray[1].slice(0, 12);
+		h1.textContent = `${lat} • ${lon}`;
+	} else {
+		console.log('else');
+		h1.textContent = message;
+	}
 };
 
 export const updateScreenReaderConfirmation = message => {
@@ -98,7 +115,6 @@ const getWeatherClass = icon => {
 };
 
 const setBGImage = weatherClass => {
-	console.log(weatherClass);
 	document.documentElement.classList.add(weatherClass);
 	document.documentElement.classList.forEach(img => {
 		if (img !== weatherClass) {
