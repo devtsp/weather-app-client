@@ -184,7 +184,7 @@ const createCurrentConditionsDivs = async (weatherJson, unit) => {
 
 const createIconDiv = async (icon, altText) => {
 	const iconDiv = createElement('div', 'icon');
-	iconDiv.id = 'icon';
+	iconDiv.id = 'icon' + Math.random();
 	const svg = await getSvgParsedString(icon);
 	iconDiv.innerHTML = svg;
 	// svg.ariaHidden = true;
@@ -220,7 +220,12 @@ async function getSvgParsedString(svgName) {
 		// Convert the SVG element to an HTML string
 		const svgString = new XMLSerializer().serializeToString(svgElement);
 
-		return svgString;
+		const replaced = svgString.replace(
+			/cls/g,
+			'cls' + Math.round(Math.random() * 500)
+		);
+
+		return replaced;
 	} catch (error) {
 		console.error(`Error loading or parsing SVG: ${error}`);
 		return ':(';
