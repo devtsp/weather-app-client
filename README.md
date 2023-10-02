@@ -1,4 +1,4 @@
-# [ Weather App](https://github.com/devtsp/weather-app-client)
+# [ Weather App](weather-app-client-sigma.vercel.app)
 Built with vanilla JS an scss
 - Responsive
 - Store custom location
